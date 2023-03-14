@@ -5,14 +5,14 @@ function verifyToken(req, res, next) {
     token = token.split(" ")[1];
     jwt.verify(token, process.env.JWT_KEY, (err, payload) => {
       if (err) {
-        return res.status(401).send({ meassage: "please provide valid token" });
+        res.status(401).send({ meassage: "please provide valid token" });
       } else {
         req.user = payload.user;
         next();
       }
     });
   } else {
-    return res.status(403).send({ result: "Please add token with headers" });
+    res.status(403).send({ result: "Please add token with headers" });
   }
 }
 module.exports = verifyToken;

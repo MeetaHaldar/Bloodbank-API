@@ -1,29 +1,32 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
-
+const Receiver = require("../models/Receiver");
 const registeruser = async (req, res) => {
   if (
     !req.body.name ||
     !req.body.email ||
     !req.body.password ||
-    !req.body.userType
+    !req.body.age ||
+    !req.body.phone ||
+    !req.body.bloodGroup
   ) {
     return res.json({ message: "each field is required" });
   }
 
-  const { name, email, password, userType } = req.body;
-  const match = await User.find({ email: email, userType: userType });
-  if (match) {
+  const { name, email, password, bloodGroup, age, phone } = req.body;
+  const match = await Receiver.find({ email: email });
+  if (match.length !== 0) {
     return res.send("user already exist");
   }
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const newUser = new User({
+  const newUser = new Receiver({
     name,
     email,
-    userType,
     password: hashedPassword,
+    bloodGroup,
+    age,
+    phone,
   });
   try {
     const user = await newUser.save();
@@ -46,10 +49,9 @@ const registeruser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-  if (req.body.email && req.body.password && req.body.userType) {
-    const user = await User.findOne({
+  if (req.body.email && req.body.password) {
+    const user = await Receiver.findOne({
       email: req.body.email,
-      userType: req.body.userType,
     });
     const match = await bcrypt.compare(req.body.password, user.password);
 
